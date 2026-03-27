@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Распродажа - GAMING STORE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">GAMING STORE</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav me-auto">
+                    <a class="nav-link" href="index.html">Главная</a>
+                    <a class="nav-link" href="catalog.html">Каталог</a>
+                    <a class="nav-link" href="sellers.html">Продавцы</a>
+                    <a class="nav-link" href="new-games.html">Новинки</a>
+                    <a class="nav-link active" href="sale.html">Распродажа</a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <a href="cart.html" class="btn btn-outline-light me-2">
+                        <i class="fas fa-shopping-cart"></i> Корзина
+                    </a>
+                    <div id="auth-buttons"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container mt-4">
+            <div class="alert alert-danger text-center">
+                <h1 class="display-4">SALE</h1>
+                <p class="lead mb-0">Скидки до 60%! Успейте купить!</p>
+            </div>
+            <div class="row" id="sale-games-container"></div>
+            <div class="alert alert-warning text-center mt-4">
+                <h4>Распродажа заканчивается через:</h4>
+                <div class="display-6 text-danger" id="countdown">3 дня 12 часов</div>
+                <p class="mt-2 mb-0">Успейте купить по скидочной цене!</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light py-4 mt-auto">
+        <div class="container text-center">
+            <p>&copy; 2025 GAMING STORE. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        const saleGames = [
+            { id: 1, title: "The Witcher 3", price: 1999, oldPrice: 4999, discount: 60, image: "https://via.placeholder.com/300x200?text=Witcher+3" },
+            { id: 2, title: "Cyberpunk 2077", price: 2499, oldPrice: 4999, discount: 50, image: "https://via.placeholder.com/300x200?text=Cyberpunk" },
+            { id: 3, title: "Baldur's Gate 3", price: 2999, oldPrice: 4999, discount: 40, image: "https://via.placeholder.com/300x200?text=Baldur's+Gate" }
+        ];
+        
+        function displaySaleGames() {
+            const container = document.getElementById('sale-games-container');
+            container.innerHTML = saleGames.map(game => `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-danger">
+                        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger fs-6">
+                            -${game.discount}%
+                        </span>
+                        <img src="${game.image}" class="card-img-top" alt="${game.title}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">${game.title}</h5>
+                            <div class="d-flex align-items-center">
+                                <span class="text-danger fs-4 fw-bold">${game.price} ₽</span>
+                                <span class="text-muted text-decoration-line-through ms-2">${game.oldPrice} ₽</span>
+                            </div>
+                            <span class="badge bg-success mt-2">СКИДКА</span>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-danger btn-sm add-to-cart" data-game-id="${game.id}">В корзину</button>
+                            <a href="game-detail.html?id=${game.id}" class="btn btn-outline-secondary btn-sm">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const gameId = parseInt(btn.dataset.gameId);
+                    const game = saleGames.find(g => g.id === gameId);
+                    cart.addItem({...game, seller: {login: "Game Store"}});
+                });
+            });
+        }
+        
+        function updateCountdown() {
+            const countdownDiv = document.getElementById('countdown');
+            if (countdownDiv) {
+                // Простой таймер для демо
+                setInterval(() => {
+                    const now = new Date();
+                    const end = new Date();
+                    end.setDate(end.getDate() + 3);
+                    const diff = end - now;
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    countdownDiv.textContent = `${days} дней ${hours} часов`;
+                }, 1000);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            displaySaleGames();
+            updateCountdown();
+            cart.updateCartCount();
+        });
+    </script>
+</body>
+</html>
